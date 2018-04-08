@@ -25,7 +25,9 @@ Important Note: GPS Receivers do not work well inside buildings and do take some
 """
 
 import serial
- 
+import logging
+
+
 
 class Fake_Serial:
     """ A fake serial object that outputs a line of old data. Only used for 
@@ -38,13 +40,20 @@ class Fake_Serial:
 
 class GPS:
     
-    def __init__(self,port='/dev/ttyAMA0',fake=False):
+    def __init__(self,port='/dev/ttyAMA0',fake=False,debug=False):
         
         # If fake flag is on, we read fake data.
         if(fake):
             self.ser = Fake_Serial()
         else:
             self.ser = serial.Serial(port=port, baudrate=9600)
+            
+        # If debug, then we log all the debug messages
+        # Logging GPS data for debugging purposes.
+        if(debug):
+            logging.basicConfig(filename='gps.log',level=logging.DEBUG)
+        else:
+            logging.basicConfig(filename='gps.log',level=logging.INFO)
         
 
     def read_lat_long_DMM(self):
@@ -64,23 +73,29 @@ gps_code,?       ,?,latitude,dir,longitude,dir,?  ,?    ,?     ,,,?
         """
         line = self.ser.readline()
         gps_code = line[:6]
-        #print(line)
         
-        while((gps_code != '$GPGGA') and (gps_code != '$GPGGA')):
+        logging.debug("Line read: {}".format(line))
+        logging.debug("GPS Code: {}".format(gps_code))
+        
+        
+        while((gps_code != '$GPRMC')):
             line = self.ser.readline()
-            
             gps_code = line[:6]
-            #print(gps_code)
-        
+            
+            logging.debug("Line read: {}".format(line))
+            logging.debug("GPS Code: {}".format(gps_code))
         
         values = line.split(',')
         
-        # Reading lat and long values in DMM format.
-        latitude_DMM = values[2]
-        latitude_dir = values[3]
+        logging.debug("Split Line: {}".format(values))
         
-        longitude_DMM = values[4]
-        longitude_dir = values[5]
+        
+        # Reading lat and long values in DMM format.
+        latitude_DMM = values[3]
+        latitude_dir = values[4]
+        
+        longitude_DMM = values[5]
+        longitude_dir = values[6]
         
         return (latitude_DMM,latitude_dir,longitude_DMM,longitude_dir)
         
@@ -134,7 +149,13 @@ gps_code,?       ,?,latitude,dir,longitude,dir,?  ,?    ,?     ,,,?
         
                 
 if(__name__ == '__main__'):
-    gps = GPS()
+    # Create a GPS object using fake data and logging all messages.
+    # Use this for testing
+    gps = GPS(fake=True,debug=True)
+    
+    # Uncomment below and comment above to use this for production
+    # gps = GPS()
+    
     while(True):
         print(gps.read_lat_long_DD())
         
