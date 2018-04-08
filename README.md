@@ -2,6 +2,7 @@
 
 ## Raspberry Pi 3 Pinout
 ![Raspberry Pi](images/raspberry_pi_pinout.png)
+![Raspberry Pi Expanded](images/raspberry_pi_pinout_expanded.png)
 
 ## GPS Module (Sparkfun Venus)
 RPI -> GPS  
