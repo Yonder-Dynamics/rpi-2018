@@ -1,5 +1,8 @@
 # 2018_URC
 
+## Raspberry Pi 3 Pinout
+![Raspberry Pi](images/raspberry_pi_pinout.png)
+
 ## GPS Module (Sparkfun Venus)
 RPI -> GPS  
 RX -> TX  
